@@ -8,12 +8,22 @@ on:
     paths:
       - "charts/**"
 
+permissions:
+  contents: read
+
 jobs:
   release:
+    permissions:
+      contents: write  # for helm/chart-releaser-action to push chart release and create a release
     runs-on: ubuntu-latest
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@eb238b55efaa70779f274895e782ed17c84f2895 # v2.6.1
+        with:
+          egress-policy: audit
+
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2.7.0
         with:
           fetch-depth: 0
       - name: Configure Git
@@ -21,7 +31,7 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.1.0
+        uses: helm/chart-releaser-action@565e7795cebb33bb2cf4f52ab8f779e21b9fa262 # v1.1.0
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         with:
